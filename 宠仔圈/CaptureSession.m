@@ -7,7 +7,6 @@
 //
 
 #import "CaptureSession.h"
-
 #import "EncoderAAC.h"
 #import "EncodeH264.h"
 

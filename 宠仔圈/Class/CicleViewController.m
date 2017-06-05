@@ -20,7 +20,7 @@
     // Do any additional setup after loading the view.
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btn setTitle:@"lick" forState:UIControlStateNormal];
+    [btn setTitle:@"点击进入编码界面" forState:UIControlStateNormal];
     btn.frame = CGRectMake(100, 100, 50, 50);
     btn.backgroundColor = [UIColor redColor];
     [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
