@@ -21,7 +21,7 @@
     
     UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
     [btn setTitle:@"点击进入编码界面" forState:UIControlStateNormal];
-    btn.frame = CGRectMake(100, 100, 50, 50);
+    btn.frame = CGRectMake(100, 100, 200, 20);
     btn.backgroundColor = [UIColor redColor];
     [btn addTarget:self action:@selector(click) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn];
