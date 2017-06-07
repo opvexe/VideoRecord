@@ -247,6 +247,7 @@
 				TargetAttributes = {
 					5C7AC6D81EC9C087006BB860 = {
 						CreatedOnToolsVersion = 8.3.2;
+						DevelopmentTeam = 3NJC3EGBWR;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -425,7 +426,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3NJC3EGBWR;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "/Users/jieku/Downloads/Record-master/宠仔圈/RecordView/Define/Header.h";
 				INFOPLIST_FILE = "宠仔圈/Info.plist";
@@ -440,7 +441,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3NJC3EGBWR;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "/Users/jieku/Downloads/Record-master/宠仔圈/RecordView/Define/Header.h";
 				INFOPLIST_FILE = "宠仔圈/Info.plist";

@@ -20,7 +20,7 @@
     // Do any additional setup after loading the view.
     
     self.view.backgroundColor = [UIColor whiteColor];
-    DecodeView *decodeView = [[DecodeView alloc]initWithFrame:self.view.bounds];
+    DecodeView *decodeView = [[DecodeView alloc]initWithFrame:[UIScreen mainScreen].bounds];
     [decodeView startDecode];
     [self.view addSubview:decodeView];
     
