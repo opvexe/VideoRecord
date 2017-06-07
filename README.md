@@ -1,0 +1,21 @@
+
+H.264由视讯编码层(Video Coding Layer，VCL)与网络提取层(Network Abstraction Layer，NAL)组成。
+H.264包含一个内建的NAL网络协议适应层，藉由NAL来提供网络的状态，让VCL有更好的编译码弹性与纠错能力。
+H.264的介绍看这里
+H.264的码流结构
+重点对象：
+
+序列参数集SPS：作用于一系列连续的编码图像；
+图像参数集PPS：作用于编码视频序列中一个或多个独立的图像；
+
+码流结构里面的图
+2、VideoToolbox
+
+VideoToolbox是iOS8以后开放的硬编码与硬解码的API，一组用C语言写的函数。使用流程如下：
+
+1、-initVideoToolBox中调用VTCompressionSessionCreate创建编码session，然后调用VTSessionSetProperty设置参数，最后调用VTCompressionSessionPrepareToEncodeFrames开始编码；
+2、开始视频录制，获取到摄像头的视频帧，传入-encode:，调用VTCompressionSessionEncodeFrame传入需要编码的视频帧，如果返回失败，调用VTCompressionSessionInvalidate销毁session，然后释放session；
+3、每一帧视频编码完成后会调用预先设置的编码函数didCompressH264，如果是关键帧需要用CMSampleBufferGetFormatDescription获取CMFormatDescriptionRef，然后用
+CMVideoFormatDescriptionGetH264ParameterSetAtIndex取得PPS和SPS；
+最后把每一帧的所有NALU数据前四个字节变成0x00 00 00 01之后再写入文件；
+4、调用VTCompressionSessionCompleteFrames完成编码，然后销毁session：VTCompressionSessionInvalidate，释放session。
