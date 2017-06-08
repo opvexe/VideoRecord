@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C247E2C1EE9207E00F31268 /* Shader.vsh in Resources */ = {isa = PBXBuildFile; fileRef = 5C247E2A1EE9207E00F31268 /* Shader.vsh */; };
+		5C247E2D1EE9207E00F31268 /* Shader.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 5C247E2B1EE9207E00F31268 /* Shader.fsh */; };
 		5C7AC6DE1EC9C087006BB860 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C7AC6DD1EC9C087006BB860 /* main.m */; };
 		5C7AC6E11EC9C087006BB860 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C7AC6E01EC9C087006BB860 /* AppDelegate.m */; };
 		5C7AC6E41EC9C087006BB860 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5C7AC6E31EC9C087006BB860 /* ViewController.m */; };
@@ -31,6 +33,8 @@
 
 /* Begin PBXFileReference section */
 		5C247E281EE838BD00F31268 /* Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
+		5C247E2A1EE9207E00F31268 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
+		5C247E2B1EE9207E00F31268 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
 		5C7AC6D91EC9C087006BB860 /* 宠仔圈.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "宠仔圈.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C7AC6DD1EC9C087006BB860 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5C7AC6DF1EC9C087006BB860 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -208,6 +212,8 @@
 		5CE1AE501ECB5B780042E296 /* Decode(解码) */ = {
 			isa = PBXGroup;
 			children = (
+				5C247E2A1EE9207E00F31268 /* Shader.vsh */,
+				5C247E2B1EE9207E00F31268 /* Shader.fsh */,
 				5CE1AE541ECBFB3C0042E296 /* JWOpenGLView.h */,
 				5CE1AE551ECBFB3C0042E296 /* JWOpenGLView.m */,
 				5CE1AE511ECBF7240042E296 /* DecodeView.h */,
@@ -275,9 +281,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C247E2C1EE9207E00F31268 /* Shader.vsh in Resources */,
 				5C7AC6EC1EC9C087006BB860 /* LaunchScreen.storyboard in Resources */,
 				5C7AC6E91EC9C087006BB860 /* Assets.xcassets in Resources */,
 				5C7AC6E71EC9C087006BB860 /* Main.storyboard in Resources */,
+				5C247E2D1EE9207E00F31268 /* Shader.fsh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,11 +436,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3NJC3EGBWR;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "/Users/jieku/Downloads/Record-master/宠仔圈/RecordView/Define/Header.h";
+				GCC_PREFIX_HEADER = "/Users/jieku/Desktop/V/Record-master/宠仔圈/RecordView/Define/Header.h";
 				INFOPLIST_FILE = "宠仔圈/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = zhunkuai.withyou;
+				PRODUCT_BUNDLE_IDENTIFIER = zhunkuai.withyouddd;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -443,11 +451,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = 3NJC3EGBWR;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "/Users/jieku/Downloads/Record-master/宠仔圈/RecordView/Define/Header.h";
+				GCC_PREFIX_HEADER = "/Users/jieku/Desktop/V/Record-master/宠仔圈/RecordView/Define/Header.h";
 				INFOPLIST_FILE = "宠仔圈/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = zhunkuai.withyou;
+				PRODUCT_BUNDLE_IDENTIFIER = zhunkuai.withyouddd;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

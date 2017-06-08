@@ -45,7 +45,6 @@ OSStatus audioConverterComplexInputDataProc(AudioConverterRef inAudioConverter,U
      ConverterContext *convertContext;
      dispatch_queue_t encodeQueue;
 }
-@property (nonatomic, copy) NSString *path;
 @property (nonatomic, strong) NSFileHandle *handle;
 @end
 @implementation EncoderAAC
@@ -55,17 +54,11 @@ OSStatus audioConverterComplexInputDataProc(AudioConverterRef inAudioConverter,U
     if ( self = [super init]) {
         encodeQueue = dispatch_queue_create("myencode", DISPATCH_QUEUE_SERIAL);
         //保存aac数据到沙盒中document，可以iTunes播放
-        self.path = AudioAacPath;
-        NSFileManager *manager = [NSFileManager defaultManager];
-        BOOL a =  [manager createFileAtPath:_path contents:nil attributes:nil];
-        if (a) {
-            NSLog(@"creat file success");
-        }else{
-            NSLog(@"creat file fail");
-        }
-        NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:_path];
-        self.handle = handle;
-        
+        NSString *audioPath  = AudioAacPath;
+        [[NSFileManager defaultManager] removeItemAtPath:audioPath error:nil]; // 移除旧文件
+        [[NSFileManager defaultManager] createFileAtPath:audioPath contents:nil attributes:nil]; // 创建新文件
+        self.handle = [NSFileHandle fileHandleForWritingAtPath:audioPath];  // 管理写进文件
+        NSLog(@"audioPath == 文件名:%@",self.handle);
     }
     return self;
 }

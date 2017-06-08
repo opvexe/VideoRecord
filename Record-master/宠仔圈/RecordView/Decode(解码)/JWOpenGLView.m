@@ -1,6 +1,5 @@
 //
 //  JWOpenGLView.m
-//  JWDecode - H.264
 //
 //  Created by TSM on 16/9/5.
 //  Copyright © 2016年 evenCoder. All rights reserved.
@@ -96,16 +95,6 @@ const GLfloat kColorConversion601FullRange[] = {
             return nil;
         }
         _preferredConversion = kColorConversion709;
-    }
-    return self;
-}
-
-// storyboard和xib创建的View才调用
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    
-    if (self = [super initWithCoder:aDecoder]) {
-        
-        
     }
     return self;
 }

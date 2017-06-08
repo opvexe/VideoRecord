@@ -12,12 +12,11 @@
 @interface EncodeH264 (){
     
     dispatch_queue_t encodeQueue;
-    FILE *file;
     long timeStamp;
     VTCompressionSessionRef encodeSesion;//压缩会话
 }
 @property (nonatomic , assign) BOOL isObtainspspps;//判断是否已经获取到pps和sps
-
+@property (nonatomic, strong) NSFileHandle *handle;
 @end
 
 /**
@@ -42,32 +41,41 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
         NSLog(@"didCompressH264 data is not ready ");
         return;
     }
+    
     EncodeH264 *h264 = (__bridge EncodeH264*)userData;
     
     // 判断当前帧是否为关键帧
     bool keyframe = !CFDictionaryContainsKey( (CFArrayGetValueAtIndex(CMSampleBufferGetSampleAttachmentsArray(sampleBuffer, true), 0)), kCMSampleAttachmentKey_NotSync);
     
-    // 获取sps & pps数据. sps pps只需获取一次，保存在h264文件开头即可
-    if (keyframe && !h264.isObtainspspps)
-    {
-        size_t spsSize, spsCount;
-        size_t ppsSize, ppsCount;
+//    // 获取sps & pps数据. sps pps只需获取一次，保存在h264文件开头即可
+    if (keyframe&& !h264.isObtainspspps) {
         
-        const uint8_t *spsData, *ppsData;
-        
-        CMFormatDescriptionRef formatDesc = CMSampleBufferGetFormatDescription(sampleBuffer);
-        OSStatus err0 = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(formatDesc, 0, &spsData, &spsSize, &spsCount, 0 );
-        OSStatus err1 = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(formatDesc, 1, &ppsData, &ppsSize, &ppsCount, 0 );
-        
-        if (err0==noErr && err1==noErr)
-        {
-            h264.isObtainspspps = YES;
-            [h264 writeH264Data:(void *)spsData length:spsSize addStartCode:YES];
-            [h264 writeH264Data:(void *)ppsData length:ppsSize addStartCode:YES];
+        // CMVideoFormatDescription：图像存储方式，编解码器等格式描述
+        CMFormatDescriptionRef format = CMSampleBufferGetFormatDescription(sampleBuffer);
+        // sps
+        size_t sparameterSetSize, sparameterSetCount;
+        const uint8_t *sparameterSet;
+        OSStatus statusSPS = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 0, &sparameterSet, &sparameterSetSize, &sparameterSetCount, 0);
+        if (statusSPS == noErr) {
             
-            NSLog(@"got sps/pps data. Length: sps=%zu, pps=%zu", spsSize, ppsSize);
+            // Found sps and now check for pps
+            // pps
+            size_t pparameterSetSize, pparameterSetCount;
+            const uint8_t *pparameterSet;
+            OSStatus statusPPS = CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 1, &pparameterSet, &pparameterSetSize, &pparameterSetCount, 0);
+            if (statusPPS == noErr) {
+                
+                // found sps pps
+                NSData *sps = [NSData dataWithBytes:sparameterSet length:sparameterSetSize];
+                NSData *pps = [NSData dataWithBytes:pparameterSet length:pparameterSetSize];
+                if (h264) {
+                    
+                    [h264 gotSPS:sps withPPS:pps];
+                }
+            }
         }
     }
+
     
     size_t lengthAtOffset, totalLength;
     char *data;
@@ -88,9 +96,9 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
             naluLength = CFSwapInt32BigToHost(naluLength);
             NSLog(@"got nalu data, length=%d, totalLength=%zu", naluLength, totalLength);
             
+             NSData *dataPoint = [[NSData alloc] initWithBytes:(data + offset + lengthInfoSize) length:naluLength];
             // 保存nalu数据到文件
-            [h264 writeH264Data:data+offset+lengthInfoSize length:naluLength addStartCode:YES];
-            
+            [h264 gotEncodedData:dataPoint isKeyFrame:keyframe];
             // 读取下一个nalu，一次回调可能包含多个nalu
             offset += lengthInfoSize + naluLength;
         }
@@ -104,6 +112,11 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
     if ([super init]) {
         encodeQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         timeStamp = 0;
+        
+        NSString *filePath = VideoH264Path;
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil]; // 移除旧文件
+        [[NSFileManager defaultManager] createFileAtPath:filePath contents:nil attributes:nil]; // 创建新文件
+        self.handle = [NSFileHandle fileHandleForWritingAtPath:filePath];  // 管理写进文件
         
     }
     return self;
@@ -152,27 +165,40 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
     return YES;
 
 }
-//保存h264数据到沙盒中document，可以下载TCL播放器播放
-- (void)writeH264Data:(void*)data length:(size_t)length addStartCode:(BOOL)b
-{
-    // 添加start code
-    const Byte bytes[] = "\x00\x00\x00\x01";
+
+#pragma mark - 编码完成写入h264文件中
+- (void)gotSPS:(NSData *)sps withPPS:(NSData *)pps {
     
-    if (file) {
-        if(b)fwrite(bytes, 1, 4, file);
-        fwrite(data, 1, length, file);
-    } else {
-        NSLog(@"file null error, check if it open successed");
+    NSLog(@"gotSPSAndPPS %d withPPS %d", (int)[sps length], (int)[pps length]);
+    const char bytes[] = "\x00\x00\x00\x01";
+    size_t length = (sizeof bytes) - 1;
+    NSData *byteHeader = [NSData dataWithBytes:bytes length:length];
+    [_handle writeData:byteHeader];
+    [_handle writeData:sps];
+    [_handle writeData:byteHeader];
+    [_handle writeData:pps];
+}
+
+- (void)gotEncodedData:(NSData *)data isKeyFrame:(BOOL)isKeyFrame {
+    
+    NSLog(@"gotEncodedData %d", (int)[data length]);
+    if (_handle != NULL) {
+        
+        const char bytes[]= "\x00\x00\x00\x01";
+        size_t lenght = (sizeof bytes) - 1;
+        NSData *byteHeader = [NSData dataWithBytes:bytes length:lenght];
+        [_handle writeData:byteHeader];
+        [_handle writeData:data];
     }
 }
+
 - (void) stopEncodeSession
 {
     VTCompressionSessionCompleteFrames(encodeSesion, kCMTimeInvalid);
-    
     VTCompressionSessionInvalidate(encodeSesion);
-    
     CFRelease(encodeSesion);
     encodeSesion = NULL;
+    [self closefile];
 }
 
 - (void)encodeSmapleBuffer:(CMSampleBufferRef)sampleBuffer {
@@ -200,14 +226,9 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
         }
     });
 }
-
-- (void)openfile {
-
-    file = fopen([VideoH264Path UTF8String], "wb");
-    
-}
+#pragma mark 关闭摄像头时关闭文件
 - (void)closefile {
-    
-    fclose(file);
+    [_handle closeFile];
+    _handle = NULL;
 }
 @end
