@@ -17,7 +17,7 @@
     VTCompressionSessionRef encodeSesion;//压缩会话
 }
 @property (nonatomic , assign) BOOL isObtainspspps;//判断是否已经获取到pps和sps
-
+@property (nonatomic, strong) NSFileHandle *handle;
 @end
 
 /**
@@ -62,8 +62,14 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
         if (err0==noErr && err1==noErr)
         {
             h264.isObtainspspps = YES;
-            [h264 writeH264Data:(void *)spsData length:spsSize addStartCode:YES];
-            [h264 writeH264Data:(void *)ppsData length:ppsSize addStartCode:YES];
+//            [h264 writeH264Data:(void *)spsData length:spsSize addStartCode:YES];
+//            [h264 writeH264Data:(void *)ppsData length:ppsSize addStartCode:YES];
+            
+            NSData *sps = [NSData dataWithBytes:spsData length:spsSize];
+            NSData *pps = [NSData dataWithBytes:ppsData length:ppsSize];
+            
+            // 写入文件
+            [h264 writeSps:sps pps:pps];
             
             NSLog(@"got sps/pps data. Length: sps=%zu, pps=%zu", spsSize, ppsSize);
         }
@@ -89,7 +95,11 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
             NSLog(@"got nalu data, length=%d, totalLength=%zu", naluLength, totalLength);
             
             // 保存nalu数据到文件
-            [h264 writeH264Data:data+offset+lengthInfoSize length:naluLength addStartCode:YES];
+            
+            
+            NSData* datas = [[NSData alloc] initWithBytes:data+offset+lengthInfoSize length:naluLength];
+            
+            [h264 writeH264Data:datas addStartCode:YES];
             
             // 读取下一个nalu，一次回调可能包含多个nalu
             offset += lengthInfoSize + naluLength;
@@ -105,7 +115,17 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
         encodeQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         timeStamp = 0;
         
-        [self openfile];  //打开视频存储文件
+        //2、检查文件是否存在
+        NSFileManager * fileManager = [NSFileManager defaultManager];
+        if (![fileManager fileExistsAtPath:VideoH264Path]) {
+            //3、创建文件
+            [fileManager createFileAtPath:VideoH264Path contents:nil attributes:nil];
+        }
+        //4、创建写入对象
+        self.handle = [NSFileHandle fileHandleForWritingAtPath:VideoH264Path];
+        
+        //5、移动到文件的末尾继续写入
+        [self.handle seekToEndOfFile];
     
     }
     return self;
@@ -154,19 +174,33 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
     return YES;
 
 }
-//保存h264数据到沙盒中document，可以下载TCL播放器播放
-- (void)writeH264Data:(void*)data length:(size_t)length addStartCode:(BOOL)b
-{
-    // 添加start code
-    const Byte bytes[] = "\x00\x00\x00\x01";
-    
-    if (file) {
 
-        if(b)fwrite(bytes, 1, 4, file);
-        fwrite(data, 1, length, file);
-    } else {
-        NSLog(@"file null error, check if it open successed");
+//将sps和pps写入文件
+- (void)writeSps:(NSData*)sps pps:(NSData*)pps{
+    // 1.拼接NALU的header
+    const char bytes[] = "\x00\x00\x00\x01";
+    size_t length = (sizeof bytes) - 1;
+    NSData *ByteHeader = [NSData dataWithBytes:bytes length:length];
+    
+    // 2.将NALU的头&NALU的体写入文件
+    [self.handle writeData:ByteHeader];
+    [self.handle writeData:sps];
+    [self.handle writeData:ByteHeader];
+    [self.handle writeData:pps];
+}
+
+
+//保存h264数据到沙盒中document，可以下载TCL播放器播放
+- (void) writeH264Data:(NSData*)data addStartCode:(BOOL)b{
+    if (self.handle != NULL){
+        //帧头
+        const char bytes[] = "\x00\x00\x00\x01";
+         size_t length = (sizeof bytes) - 1;
+        NSData *header = [NSData dataWithBytes:bytes length:length];
+        [self.handle writeData:header];
+        [self.handle writeData:data];
     }
+    
 }
 - (void) stopEncodeSession
 {

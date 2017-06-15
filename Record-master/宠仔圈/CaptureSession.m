@@ -358,7 +358,6 @@
 
 -(void)dealloc{
     NSLog(@"==closefile==dealloc");
-    [_h264 closefile];
 }
 
 @end

@@ -23,11 +23,10 @@
  */
 - (BOOL)createEncodeSession:(int)width height:(int)height fps:(int)fps bite:(int)bt;
 
-- (void) writeH264Data:(void*)data length:(size_t)length addStartCode:(BOOL)b;
+- (void) writeH264Data:(NSData*)data addStartCode:(BOOL)b;
+
+- (void)writeSps:(NSData*)sps pps:(NSData*)pps;
 
 - (void)encodeSmapleBuffer:(CMSampleBufferRef)sampleBuffer;
 
-- (void)openfile;
-
-- (void)closefile;
 @end
