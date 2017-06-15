@@ -323,7 +323,7 @@ void didDecompress(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSS
     
     // H.264储存的路径
     NSString *filePath = VideoH264Path;
-
+    NSLog(@"%@",filePath);
     // 用NSInputStream读入原始H.264码流
     _inputStream = [[NSInputStream alloc] initWithFileAtPath:filePath];
     [_inputStream open];

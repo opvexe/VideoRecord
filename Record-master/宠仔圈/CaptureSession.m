@@ -357,7 +357,8 @@
 }
 
 -(void)dealloc{
-    NSLog(@"==CaptureSession==dealloc");
+    NSLog(@"==closefile==dealloc");
+    [_h264 closefile];
 }
 
 @end

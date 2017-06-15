@@ -53,7 +53,7 @@ OSStatus audioConverterComplexInputDataProc(AudioConverterRef inAudioConverter,U
 - (instancetype)init {
     
     if ( self = [super init]) {
-        encodeQueue = dispatch_queue_create("myencode", DISPATCH_QUEUE_SERIAL);
+        encodeQueue = dispatch_queue_create("encode", DISPATCH_QUEUE_SERIAL);
         //保存aac数据到沙盒中document，可以iTunes播放
         self.path = AudioAacPath;
         NSFileManager *manager = [NSFileManager defaultManager];

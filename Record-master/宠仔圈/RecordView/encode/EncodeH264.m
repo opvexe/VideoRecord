@@ -105,6 +105,8 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
         encodeQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         timeStamp = 0;
         
+        [self openfile];  //打开视频存储文件
+    
     }
     return self;
 }
@@ -159,6 +161,7 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
     const Byte bytes[] = "\x00\x00\x00\x01";
     
     if (file) {
+
         if(b)fwrite(bytes, 1, 4, file);
         fwrite(data, 1, length, file);
     } else {
@@ -172,6 +175,7 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
     VTCompressionSessionInvalidate(encodeSesion);
     
     CFRelease(encodeSesion);
+    
     encodeSesion = NULL;
 }
 
@@ -204,7 +208,6 @@ void encodeOutputCallback(void *userData, void *sourceFrameRefCon, OSStatus stat
 - (void)openfile {
 
     file = fopen([VideoH264Path UTF8String], "wb");
-    
 }
 - (void)closefile {
     
